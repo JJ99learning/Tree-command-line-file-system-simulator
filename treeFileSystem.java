@@ -13,6 +13,7 @@ import javax.security.sasl.SaslServer;
 class FileNode {
     public String name;
     public boolean isFile;
+    public String content;
 
     @JsonIgnore // Prevent infinite recursion when saving
     public FileNode parent;
@@ -28,6 +29,7 @@ class FileNode {
 
         if (!isFile) {
             this.child = new ArrayList<>();
+            this.content = "";
         }
 
     }
@@ -60,6 +62,41 @@ class FileSystem {
             current = root;
         }
 
+    }
+
+    public void write(String filename) {
+        for (FileNode file : current.child) {
+            if (file.isFile && file.name.equals(filename)) {
+                Scanner sc = new Scanner(System.in);
+                boolean isContinue = true;
+                StringBuilder sb = new StringBuilder();
+                String userInputContent;
+                while (isContinue) {
+                    userInputContent = sc.nextLine();
+                    if (userInputContent.equals(":wq")) {
+                        isContinue = false;
+                        break;
+                    }
+
+                    sb.append(userInputContent).append(System.lineSeparator());
+                }
+
+                file.content = sb.toString();
+                System.out.println("Content saved to " + file.name);
+                return;
+            }
+
+        }
+
+        System.out.println("File " + filename + " not found!");
+    }
+
+    public void cat(String filename) {
+        for (FileNode file : current.child) {
+            if (file.isFile && file.name.equals(filename)) {
+                System.out.println(file.content);
+            }
+        }
     }
 
     public void save() {
@@ -137,6 +174,7 @@ public class treeFileSystem {
                 case "mkdir":
                     if (command.length > 1) {
                         fs.mkdir(command[1]);
+                        fs.save();
                     } else {
                         System.out.println("Usage: mkdir <foldername>");
                     }
@@ -144,8 +182,24 @@ public class treeFileSystem {
                 case "touch":
                     if (command.length > 1) {
                         fs.touch(command[1]);
+                        fs.save();
                     } else {
                         System.out.println("Usage: touch <filename>");
+                    }
+                    break;
+                case "write":
+                    if (command.length > 1) {
+                        fs.write(command[1]);
+                        fs.save();
+                    } else {
+                        System.out.println("Usage: writer <filename>");
+                    }
+                    break;
+                case "cat":
+                    if (command.length > 1) {
+                        fs.cat(command[1]);
+                    } else {
+                        System.out.println("Usage: cat <filename>");
                     }
                     break;
                 case "ls":
