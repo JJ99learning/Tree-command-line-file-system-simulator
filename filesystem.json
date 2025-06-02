@@ -1,0 +1,22 @@
+{
+  "name" : "/",
+  "isFile" : false,
+  "child" : [ {
+    "name" : "fol1",
+    "isFile" : false,
+    "child" : [ {
+      "name" : "filessssss",
+      "isFile" : true
+    } ]
+  }, {
+    "name" : "fil1",
+    "isFile" : true
+  }, {
+    "name" : "fol2",
+    "isFile" : false,
+    "child" : [ ]
+  }, {
+    "name" : "newText.txt",
+    "isFile" : true
+  } ]
+}
