@@ -152,7 +152,6 @@ class FileSystem {
                 current = files;
             }
 
-            return;
         }
 
         System.out.println("Folder Not Found!");
