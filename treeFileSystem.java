@@ -39,7 +39,7 @@ class FileNode {
 class FileSystem {
     private FileNode root;
     private FileNode current;
-
+    public List<String> currentPath = new ArrayList<>();
     private static final String SAVE_FILE = "filesystem.json";
 
     FileSystem() {
@@ -62,6 +62,34 @@ class FileSystem {
             current = root;
         }
 
+        currentPath.add("/");
+
+    }
+
+    public String getCurrentPath(){
+        String pathToShow = "";
+        for(String path : currentPath){
+            pathToShow += path;
+        }
+
+        return pathToShow;
+    }
+
+    public boolean isCreationAllow(String filename, boolean isFile){
+        for(FileNode file : current.child){
+            if(file.name.equals(filename)){
+                if(file.isFile == isFile){
+                    System.out.print(isFile ? "[File] - " : "[Folder] - ");
+                    System.out.println(filename + " already exists!");
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+        }
+        
+
+        return true;
     }
 
     public void write(String filename) {
@@ -95,8 +123,11 @@ class FileSystem {
         for (FileNode file : current.child) {
             if (file.isFile && file.name.equals(filename)) {
                 System.out.println(file.content);
+                return;
             }
         }
+
+        System.out.println("File " + filename + " not found!");
     }
 
     public void save() {
@@ -120,11 +151,19 @@ class FileSystem {
     }
 
     public void mkdir(String name) {
-        current.child.add(new FileNode(name, false, current));
+        if(isCreationAllow(name, false)){
+            current.child.add(new FileNode(name, false, current));
+            save();
+        }
+        
     }
 
     public void touch(String name) {
-        current.child.add(new FileNode(name, true, current));
+        if(isCreationAllow(name, true)){
+            current.child.add(new FileNode(name, true, current));
+            save();
+        }
+        
     }
 
     public void ls() {
@@ -141,15 +180,18 @@ class FileSystem {
     public void cd(String name) {
         if (name.equals("..")) {
             if (current.parent != null) {
+                currentPath.removeLast();
                 current = current.parent;
             }
-
+            
             return;
         }
 
         for (FileNode files : current.child) {
             if (files.name.equals(name) && !files.isFile) {
                 current = files;
+                currentPath.add(current.name + "/");
+                return;
             }
 
         }
@@ -167,13 +209,12 @@ public class treeFileSystem {
         FileSystem fs = new FileSystem();
         boolean isContinue = true;
         while (isContinue) {
-            System.out.print(">> ");
+            System.out.print(fs.getCurrentPath() + " >> ");
             String[] command = sc.nextLine().split(" ");
             switch (command[0]) {
                 case "mkdir":
                     if (command.length > 1) {
                         fs.mkdir(command[1]);
-                        fs.save();
                     } else {
                         System.out.println("Usage: mkdir <foldername>");
                     }
@@ -181,7 +222,6 @@ public class treeFileSystem {
                 case "touch":
                     if (command.length > 1) {
                         fs.touch(command[1]);
-                        fs.save();
                     } else {
                         System.out.println("Usage: touch <filename>");
                     }
