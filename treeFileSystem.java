@@ -200,6 +200,18 @@ class FileSystem {
 
     }
 
+    public List<String> searchInCurrentDir(String name){
+        List<String> founds = new ArrayList<>();
+        for(FileNode file : current.child){
+            if(file.name.equals(name)){
+                String prefix = file.isFile ? "[File] - " : "[Folder] - ";
+                founds.add(prefix + file.name);
+            }
+        }
+
+        return founds;
+    }
+
 }
 
 public class treeFileSystem {
@@ -249,6 +261,19 @@ public class treeFileSystem {
                         fs.cd(command[1]);
                     } else {
                         System.out.println("Usage: cd <foldername>");
+                    }
+                    break;
+                case "searchHere":
+                    if(command.length > 1){
+                        List<String> searchResult = fs.searchInCurrentDir(command[1]);
+                        if(searchResult.size() > 0){
+                            System.out.println("Result found: " + searchResult.size());
+                            System.out.println(searchResult);
+                        }else{
+                            System.out.println(command[1] + " not found in this dir!");
+                        }
+                    }else{
+                        System.out.println("Usage: searchHere <name>");
                     }
                     break;
                 case "exit":
