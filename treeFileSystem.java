@@ -141,6 +141,19 @@ class FileSystem {
         }
     }
 
+    public void rm(String name, boolean isFile) {
+        for(FileNode file : current.child){
+            if(file.name.equals(name) && file.isFile == isFile){
+                current.child.remove(file);
+                System.out.println(file.name + " is removed!");
+                save();
+                return;
+            }
+        }
+
+        System.out.println("Filename: " + name + " not found! Delete failed!");
+    }
+
     private void setParents(FileNode node, FileNode parent) {
         node.parent = parent;
         if (node.child != null) {
@@ -274,6 +287,13 @@ public class treeFileSystem {
                         }
                     }else{
                         System.out.println("Usage: searchHere <name>");
+                    }
+                    break;
+                case "rm":
+                    if(command.length > 2){
+                        fs.rm(command[1], Boolean.parseBoolean(command[2]));
+                    }else{
+                        System.out.println("Usage: rm <name> <boolean: isFile?>");
                     }
                     break;
                 case "exit":
